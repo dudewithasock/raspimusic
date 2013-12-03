@@ -21,8 +21,8 @@ import com.jogamp.opengl.util.texture.TextureSequence.TextureFrame;
 public class MediaPlayer
 {
 	static GLMediaPlayer player;
-	
-	
+
+
 	/**
 	 * @param args
 	 */
@@ -32,62 +32,49 @@ public class MediaPlayer
 		String filename = args[0];
 		String resource;
 		URI uri;
-		
+
 		System.out.println("Hello Media Player...");
-		System.out.println("Debug testing");
-		
-//		MediaPlayer mediaPlayer = new MediaPlayer();
-		
+
 		player = GLMediaPlayerFactory.createDefault();
 		System.out.println(player.toString());
-		
-//		final GLProfile glp;
-//		glp = GLProfile.getGL2ES2();
-//		System.out.println("GLProfile: " + glp);
-//		
-//		final GLWindow window = GLWindow.create(new GLCapabilities(glp));
-//		
-//		GL2ES2 gl = window.getGL().getGL2ES2();
-//		System.out.println(JoglVersion.getGLInfo(gl, null));
-        
-		
-		
+
+		//		final GLProfile glp;
+		//		glp = GLProfile.getGL2ES2();
+		//		System.out.println("GLProfile: " + glp);
+		//		final GLWindow window = GLWindow.create(new GLCapabilities(glp));
+		//		GL2ES2 gl = window.getGL().getGL2ES2();
+		//		System.out.println(JoglVersion.getGLInfo(gl, null));
+
 		player.addEventListener(new GLMediaEventListener()
 		{
-			
+
 			@Override
 			public void newFrameAvailable(GLMediaPlayer ts, TextureFrame newFrame,
-					long when)
-			{
-			}
-			
+					long when) { }
+
 			@Override
 			public void attributesChanged(GLMediaPlayer mp, int event_mask, long when)
 			{
 				System.out.println("\n***\nEvent mask changed: " + event_mask);
 				System.out.println("Timestamp: "+ when);
 				System.out.println("State of player: " + player.getState().toString() +"\n");
-				
+
 				if ((event_mask & GLMediaEventListener.EVENT_CHANGE_INIT) !=0) {
 					System.out.println("Duration: " + player.getDuration() + "ms");
 					System.out.println("Volume: " + player.getAudioVolume());
-					try
-					{
+					try {
 						System.out.println("player.initGL()...");
 						mp.initGL(null);
 					}
-					catch (IllegalStateException e)
-					{
+					catch (IllegalStateException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					catch (GLException e)
-					{
+					catch (GLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					catch (StreamException e)
-					{
+					catch (StreamException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
@@ -109,53 +96,50 @@ public class MediaPlayer
 					new Thread() {
 						public void run() {
 							player.destroy(null);
-						} }.start();
+						}
+					}.start();
 				}
 
 			}
 		});
-		
+
 		if (player==null) {
 			System.out.println("Failed to create player!");
 		} else {
 			System.out.println("Created new player: " + player.getClass().getName());
 			try {
-				resource = MediaPlayer.class.getResource("/klubi/raspberry/music/player/" + filename).getPath();
+				resource = MediaPlayer.class.getResource("/klubi/raspberry/music/resources/" + filename).getPath();
 			} catch (Exception e) {
-				e.printStackTrace();
 				resource = MediaPlayer.class.getResource(filename).getPath();
 			}
 			System.out.println("Media file: " + resource);
-			
-			try
-			{
+
+			try {
 				uri = new URI(resource);
 				System.out.println("State of player: " + player.getState().toString());
 				System.out.println("...initializing stream...");
-				//player.initStream(uri, GLMediaPlayer.STREAM_ID_NONE, GLMediaPlayer.STREAM_ID_AUTO, GLMediaPlayer.TEXTURE_COUNT_DEFAULT);
+
 				player.initStream(uri, GLMediaPlayer.STREAM_ID_NONE, GLMediaPlayer.STREAM_ID_AUTO, GLMediaPlayer.TEXTURE_COUNT_DEFAULT);
 			}
-			catch (Exception e1)
-			{
+			catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		
+
 			StreamException se = null;
-	        while( null == se 
-	        		&& (GLMediaPlayer.State.Initialized != player.getState()) ) {
-	            try {
-	                Thread.sleep(100);
-	            } catch (InterruptedException e) { }
-	            se = player.getStreamException();
-	        }
-	        if( null != se ) {
-	            se.printStackTrace();
-	            throw new RuntimeException(se);
-	        }
-		
+			while( null == se && (GLMediaPlayer.State.Initialized != player.getState()) ) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) { }
+				se = player.getStreamException();
+			}
+			if( null != se ) {
+				se.printStackTrace();
+				throw new RuntimeException(se);
+			}
+
 		}
-		
+
 
 	}
 
