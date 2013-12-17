@@ -1,7 +1,7 @@
 //package klubi.raspberry.music.player;
 
 import java.net.URI;
-
+import java.io.File;
 import javax.media.opengl.GL2ES2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLBase;
@@ -28,14 +28,17 @@ public class MediaPlayer
 	 */
 	public static void main(String[] args)
 	{
-		//String filename = "PearlJamYellowLedbetter.mp3";
 		String filename = args[0];
 		String resource;
 		URI uri;
 
 		System.out.println("Hello Media Player...");
 
+                long a = com.jogamp.common.os.Platform.currentTimeMillis();
 		player = GLMediaPlayerFactory.createDefault();
+                long b = com.jogamp.common.os.Platform.currentTimeMillis();
+                System.out.println(b-a + "ms GLMediaPlayerFactory.createDefault()");                
+
 		System.out.println(player.toString());
 
 		//		final GLProfile glp;
@@ -108,14 +111,7 @@ public class MediaPlayer
 		} else {
 			System.out.println("Created new player: " + player.getClass().getName());
 			try {
-				resource = MediaPlayer.class.getResource("/klubi/raspberry/music/resources/" + filename).getPath();
-			} catch (Exception e) {
-				resource = MediaPlayer.class.getResource(filename).getPath();
-			}
-			System.out.println("Media file: " + resource);
-
-			try {
-				uri = new URI(resource);
+				uri = new File(filename).toURI();
 				System.out.println("State of player: " + player.getState().toString());
 				System.out.println("...initializing stream...");
 
