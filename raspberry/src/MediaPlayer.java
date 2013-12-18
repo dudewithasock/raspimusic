@@ -21,7 +21,7 @@ import com.jogamp.opengl.util.texture.TextureSequence.TextureFrame;
 public class MediaPlayer
 {
 	static GLMediaPlayer player;
-
+	static volatile boolean stop = false;
 
 	/**
 	 * @param args
@@ -98,7 +98,9 @@ public class MediaPlayer
 					}
 					new Thread() {
 						public void run() {
+							System.out.println("terminating...");							
 							player.destroy(null);
+							stop = true;
 						}
 					}.start();
 				}
@@ -111,7 +113,17 @@ public class MediaPlayer
 		} else {
 			System.out.println("Created new player: " + player.getClass().getName());
 			try {
-				uri = new File(filename).toURI();
+				System.out.println("filename = " +filename);
+				if(filename.equals("")){
+					System.out.println("No file selected");
+					System.exit(0);
+				}
+			        File file = new File(filename);
+                                if(!file.exists()){	
+					System.out.println("File do not exist");
+                                        System.exit(0);
+				}
+				uri = file.toURI();
 				System.out.println("State of player: " + player.getState().toString());
 				System.out.println("...initializing stream...");
 
@@ -122,8 +134,9 @@ public class MediaPlayer
 				e1.printStackTrace();
 			}
 
+			// Main thread waits until playback is done
 			StreamException se = null;
-			while( null == se && (GLMediaPlayer.State.Initialized != player.getState()) ) {
+			while( null == se && stop == false ) {
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) { }
@@ -134,8 +147,9 @@ public class MediaPlayer
 				throw new RuntimeException(se);
 			}
 
-		}
 
+		}
+		System.out.println("...main exit...");
 
 	}
 
